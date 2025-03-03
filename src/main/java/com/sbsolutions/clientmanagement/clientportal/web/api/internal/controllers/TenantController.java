@@ -1,7 +1,7 @@
 package com.sbsolutions.clientmanagement.clientportal.web.api.internal.controllers;
 
 
-import com.sbsolutions.clientmanagement.Global.GlobalResponse.RestResponse;
+import com.sbsolutions.clientmanagement.global.globalresponse.RestResponse;
 import com.sbsolutions.clientmanagement.clientportal.bizops.services.TenantService;
 import com.sbsolutions.clientmanagement.clientportal.web.dtos.DeletionResponse;
 import com.sbsolutions.clientmanagement.clientportal.web.dtos.TenantDTO;

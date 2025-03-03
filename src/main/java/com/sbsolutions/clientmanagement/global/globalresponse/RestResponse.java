@@ -1,7 +1,7 @@
-package com.sbsolutions.clientmanagement.Global.GlobalResponse;
+package com.sbsolutions.clientmanagement.global.globalresponse;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.sbsolutions.clientmanagement.Global.Constatnts.PaginationInfo;
+import com.sbsolutions.clientmanagement.global.constants.PaginationInfo;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 

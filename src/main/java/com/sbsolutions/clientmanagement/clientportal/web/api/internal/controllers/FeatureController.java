@@ -2,7 +2,7 @@ package com.sbsolutions.clientmanagement.clientportal.web.api.internal.controlle
 
 
 import com.sbsolutions.clientmanagement.clientportal.bizops.services.FeatureService;
-import com.sbsolutions.clientmanagement.Global.GlobalResponse.RestResponse;
+import com.sbsolutions.clientmanagement.global.globalresponse.RestResponse;
 import com.sbsolutions.clientmanagement.clientportal.web.dtos.DeletionResponse;
 import com.sbsolutions.clientmanagement.clientportal.web.dtos.FeatureDTO;
 import org.springframework.http.ResponseEntity;

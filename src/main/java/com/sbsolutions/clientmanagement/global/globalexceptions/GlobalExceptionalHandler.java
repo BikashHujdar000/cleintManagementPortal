@@ -1,7 +1,7 @@
-package com.sbsolutions.clientmanagement.Global.Exceptions;
+package com.sbsolutions.clientmanagement.global.globalexceptions;
 
 
-import com.sbsolutions.clientmanagement.Global.GlobalResponse.RestResponse;
+import com.sbsolutions.clientmanagement.global.globalresponse.RestResponse;
 import com.sbsolutions.clientmanagement.clientportal.web.exceptions.DatabaseOperationException;
 import com.sbsolutions.clientmanagement.clientportal.web.exceptions.ResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
