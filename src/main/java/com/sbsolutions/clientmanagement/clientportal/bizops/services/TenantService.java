@@ -2,8 +2,11 @@ package com.sbsolutions.clientmanagement.clientportal.bizops.services;
 
 
 
+import com.sbsolutions.clientmanagement.clientportal.bizops.entities.Tenant;
 import com.sbsolutions.clientmanagement.clientportal.web.dtos.DeletionResponse;
 import com.sbsolutions.clientmanagement.clientportal.web.dtos.TenantDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -17,4 +20,7 @@ public interface TenantService {
     List<TenantDTO> getAllTenants();
 
     DeletionResponse deleteTenant(Long tenantId);
+
+
+    Page<TenantDTO> getAll(Pageable pageable);
 }

@@ -9,6 +9,8 @@ import com.sbsolutions.clientmanagement.clientportal.bizops.entities.*;
 import com.sbsolutions.clientmanagement.clientportal.bizops.services.*;
 import com.sbsolutions.clientmanagement.clientportal.web.dtos.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -157,4 +159,28 @@ public class TenantServiceImpl implements TenantService {
 
 
     }
+
+    //fo the pageable
+    @Override
+    public Page<TenantDTO> getAll(Pageable pageable) {
+
+        Page<Tenant> tenantPage = this.tenantRepository.findAll(pageable);
+
+
+        log.info("Get all tenants with pageable {}", tenantPage);
+
+
+        // Use TenantMapper.toDTO to convert each Tenant entity to a TenantDTO
+        Page<TenantDTO> tenantDTOPage = tenantPage.map(TenantMapper::toDTO);
+        return tenantDTOPage;
+
+
+    }
+
+    // for the pageable form
+//    @Override
+//    public Page<LoanResponseInList> getAll(Pageable pageable) {
+//        return this.loanApplicationRepository.findAllLoans(pageable);
+//    }
+
 }

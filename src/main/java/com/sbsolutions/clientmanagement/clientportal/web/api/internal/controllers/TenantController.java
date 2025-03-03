@@ -1,10 +1,16 @@
 package com.sbsolutions.clientmanagement.clientportal.web.api.internal.controllers;
 
 
+import com.sbsolutions.clientmanagement.clientportal.bizops.entities.Tenant;
+import com.sbsolutions.clientmanagement.global.constants.PageUtils;
+import com.sbsolutions.clientmanagement.global.constants.PaginationInfo;
+import com.sbsolutions.clientmanagement.global.constants.SearchCriteria;
 import com.sbsolutions.clientmanagement.global.globalresponse.RestResponse;
 import com.sbsolutions.clientmanagement.clientportal.bizops.services.TenantService;
 import com.sbsolutions.clientmanagement.clientportal.web.dtos.DeletionResponse;
 import com.sbsolutions.clientmanagement.clientportal.web.dtos.TenantDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -52,4 +58,17 @@ public class TenantController {
     }
 
 
+    @GetMapping("/all")
+    public ResponseEntity<?> getAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) String sortOrder
+    ) {
+        PageRequest pageRequest = PageUtils.prepareFilterCriteria(new SearchCriteria(sortBy, sortOrder, page, size, null));
+        Page<TenantDTO> tenantPage = this.tenantService.getAll(pageRequest);
+
+        PaginationInfo paginationInfo = new PaginationInfo(tenantPage.getNumber(), tenantPage.getSize(), tenantPage.getTotalElements(), tenantPage.getTotalPages(), tenantPage.isLast());
+        return new RestResponse<>().oKWithPaginatedPayload(tenantPage.getContent(), paginationInfo, "Loans fetched Successfully.");
+    }
 }
