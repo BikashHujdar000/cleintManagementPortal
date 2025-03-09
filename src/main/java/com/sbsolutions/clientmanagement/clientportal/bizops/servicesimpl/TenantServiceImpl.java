@@ -11,16 +11,21 @@ import com.sbsolutions.clientmanagement.clientportal.web.dtos.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Transactional
 @Service
 public class TenantServiceImpl implements TenantService {
+    private  final WebClient webClient;
     private final TenantRepository tenantRepository;
     private final AdminConfigurationService adminConfigurationService;
     private final DatabaseConfigurationService databaseConfigurationService;
@@ -29,8 +34,8 @@ public class TenantServiceImpl implements TenantService {
     private final SubscriptionTierService subscriptionTierService;
 
 
-    public TenantServiceImpl(TenantRepository tenantRepository, AdminConfigurationService adminConfigurationService, DatabaseConfigurationService databaseConfigurationService, OrganizationAddressService organizationAddressService, ThemeConfigurationService themeConfigurationService, SubscriptionTierService subscriptionTierService) {
-
+    public TenantServiceImpl(WebClient webClient, TenantRepository tenantRepository, AdminConfigurationService adminConfigurationService, DatabaseConfigurationService databaseConfigurationService, OrganizationAddressService organizationAddressService, ThemeConfigurationService themeConfigurationService, SubscriptionTierService subscriptionTierService) {
+        this.webClient = webClient;
         this.tenantRepository = tenantRepository;
         this.adminConfigurationService = adminConfigurationService;
         this.databaseConfigurationService = databaseConfigurationService;
@@ -102,13 +107,72 @@ public class TenantServiceImpl implements TenantService {
             }
 
             Tenant savedTenant = this.tenantRepository.save(tenant);
+
             log.info("Saved tenant {}", savedTenant);
+
+
+            //adding the client api to set the client information in the  core app
+
+            ClientRegisterDto clientRegisterDto = new ClientRegisterDto();
+            clientRegisterDto.setName(tenantDTO.getOrganizationName());
+            clientRegisterDto.setSubdomain(tenantDTO.getSubDomainName());
+            clientRegisterDto.setDbName(tenantDTO.getOrganizationSwiftcode());
+            clientRegisterDto.setDbUrl(tenantDTO.getDatabaseConfiguration().getDbUrl());
+            clientRegisterDto.setDbUsername(tenantDTO.getDatabaseConfiguration().getDbCredentialUsername());
+            clientRegisterDto.setDbPassword(tenantDTO.getDatabaseConfiguration().getDbCredentialPassword());
+            clientRegisterDto.setIsolationType("DATABASE");
+
+            log.info("##########client Register Dto ###### {}", clientRegisterDto);
+
+//
+//            Mono<TenantResponse> tenantResponseMono = webClient.post()
+//                    .uri("http://localhost:8086/v1/admin/clients")
+//                    .contentType(MediaType.APPLICATION_JSON)
+//                    .bodyValue(clientRegisterDto)
+//                    .retrieve()
+//                    .bodyToMono(TenantResponse.class)
+//                    .doOnSuccess(response -> log.info("Tenant created successfully: {}", response))
+//                    .doOnError(error -> log.error("Error occurred while creating tenant: {}", error.getMessage()))
+//                    .onErrorResume(error -> {
+//                        log.error("Returning default response due to error: {}", error.getMessage());
+//                      throw new DatabaseOperationException("Failed to retrieve a response from an External api  " + error.getMessage());
+//                    });
+//
+//
+//
+//            TenantResponse tenantResponse = tenantResponseMono.block();  // Blocking call to get the value
+//
+//            log.info("#############Client Created Success from API Response  s:######## {}", tenantResponse);
+//
+//
+
+            Mono<TenantResponse> tenantResponseMono = webClient.post()
+                    .uri("http://localhost:8086/v1/admin/clients")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(clientRegisterDto)
+                    .retrieve()
+                    .bodyToMono(TenantResponse.class)
+                    .doOnSuccess(response -> log.info("Tenant created successfully: {}", response))
+                    ;
+
+            TenantResponse response = tenantResponseMono.block();
+
+            log.info("Tenant created successfully: {}", response);
+            log.info("########## cfreated response ##########" + response.getId() + response.getDbUrl());
+
+
             return TenantMapper.toDTO(savedTenant);
 
         }catch (Exception e)
         {
             throw new DatabaseOperationException("Failed to save tenant to the database :"+e.getMessage());
         }
+
+        //
+
+        //  now i  have to call my api using web client to exactly save  the tenant using original contents
+
+
 
     }
 
@@ -182,5 +246,7 @@ public class TenantServiceImpl implements TenantService {
 //    public Page<LoanResponseInList> getAll(Pageable pageable) {
 //        return this.loanApplicationRepository.findAllLoans(pageable);
 //    }
+
+
 
 }
