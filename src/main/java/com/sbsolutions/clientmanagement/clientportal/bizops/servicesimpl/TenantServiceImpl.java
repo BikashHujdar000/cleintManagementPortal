@@ -25,7 +25,7 @@ import java.util.Map;
 @Transactional
 @Service
 public class TenantServiceImpl implements TenantService {
-    private  final WebClient webClient;
+    private final WebClient webClient;
     private final TenantRepository tenantRepository;
     private final AdminConfigurationService adminConfigurationService;
     private final DatabaseConfigurationService databaseConfigurationService;
@@ -120,66 +120,43 @@ public class TenantServiceImpl implements TenantService {
             clientRegisterDto.setDbUrl(tenantDTO.getDatabaseConfiguration().getDbUrl());
             clientRegisterDto.setDbUsername(tenantDTO.getDatabaseConfiguration().getDbCredentialUsername());
             clientRegisterDto.setDbPassword(tenantDTO.getDatabaseConfiguration().getDbCredentialPassword());
+            clientRegisterDto.setAdminEmail(tenantDTO.getAdminConfiguration().getEmail());
+            clientRegisterDto.setAdminUsername(tenantDTO.getAdminConfiguration().getUsername());
+            clientRegisterDto.setAdminPassword(tenantDTO.getAdminConfiguration().getPassword());
             clientRegisterDto.setIsolationType("DATABASE");
 
-            log.info("##########client Register Dto ###### {}", clientRegisterDto);
 
-//
-//            Mono<TenantResponse> tenantResponseMono = webClient.post()
-//                    .uri("http://localhost:8086/v1/admin/clients")
-//                    .contentType(MediaType.APPLICATION_JSON)
-//                    .bodyValue(clientRegisterDto)
-//                    .retrieve()
-//                    .bodyToMono(TenantResponse.class)
-//                    .doOnSuccess(response -> log.info("Tenant created successfully: {}", response))
-//                    .doOnError(error -> log.error("Error occurred while creating tenant: {}", error.getMessage()))
-//                    .onErrorResume(error -> {
-//                        log.error("Returning default response due to error: {}", error.getMessage());
-//                      throw new DatabaseOperationException("Failed to retrieve a response from an External api  " + error.getMessage());
-//                    });
-//
-//
-//
-//            TenantResponse tenantResponse = tenantResponseMono.block();  // Blocking call to get the value
-//
-//            log.info("#############Client Created Success from API Response  s:######## {}", tenantResponse);
-//
-//
+            Mono<TenantResponse> tenantResponseMono = null;
+            try {
 
-            Mono<TenantResponse> tenantResponseMono = webClient.post()
-                    .uri("http://localhost:8086/v1/admin/clients")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(clientRegisterDto)
-                    .retrieve()
-                    .bodyToMono(TenantResponse.class)
-                    .doOnSuccess(response -> log.info("Tenant created successfully: {}", response))
-                    ;
+                tenantResponseMono = webClient.post()
+                        .uri("http://localhost:8086/v1/admin/clients")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(clientRegisterDto)
+                        .retrieve()
+                        .bodyToMono(TenantResponse.class)
+                        .doOnSuccess(response -> log.info("Tenant created successfully: {}", response));
+
+            } catch (Exception e) {
+                throw new DatabaseOperationException("Failed to call an External Api : " + e.getMessage());
+            }
 
             TenantResponse response = tenantResponseMono.block();
 
             log.info("Tenant created successfully: {}", response);
-            log.info("########## cfreated response ##########" + response.getId() + response.getDbUrl());
-
 
             return TenantMapper.toDTO(savedTenant);
 
-        }catch (Exception e)
-        {
-            throw new DatabaseOperationException("Failed to save tenant to the database :"+e.getMessage());
+        } catch (Exception e) {
+            throw new DatabaseOperationException("Failed to save tenant to the database :" + e.getMessage());
         }
-
-        //
-
-        //  now i  have to call my api using web client to exactly save  the tenant using original contents
-
 
 
     }
 
-
     @Override
     public TenantDTO updateTenant(Long tenantId, TenantDTO tenantDTO) {
-        throw  new DatabaseOperationException("Updating the tenant Information is not supported");
+        throw new DatabaseOperationException("Updating the tenant Information is not supported");
     }
 
 
@@ -190,7 +167,7 @@ public class TenantServiceImpl implements TenantService {
                     .orElseThrow(() -> new ResourceNotFoundException("Tenant", "Tenant Id ", tenantId));
             return TenantMapper.toDTO(tenant);
         } catch (Exception e) {
-            throw new DatabaseOperationException("Failed to retrieve the data from the database :"+e.getMessage());
+            throw new DatabaseOperationException("Failed to retrieve the data from the database :" + e.getMessage());
         }
 
     }
@@ -201,7 +178,7 @@ public class TenantServiceImpl implements TenantService {
             List<Tenant> tenants = tenantRepository.findAll();
             return tenants.stream().map(TenantMapper::toDTO).toList();
         } catch (Exception e) {
-            throw new DatabaseOperationException("Failed to retrieve the data from the database :"+e.getMessage());
+            throw new DatabaseOperationException("Failed to retrieve the data from the database :" + e.getMessage());
         }
 
     }
@@ -213,12 +190,11 @@ public class TenantServiceImpl implements TenantService {
             Tenant tenant = tenantRepository.findById(tenantId)
                     .orElseThrow(() -> new ResourceNotFoundException("Tenant", "Tenant Id ", tenantId));
             tenantRepository.deleteById(tenant.getTenantId());
-            DeletionResponse response =new DeletionResponse(true,"Tenant deleted successfully With tenantId: "+tenantId);
+            DeletionResponse response = new DeletionResponse(true, "Tenant deleted successfully With tenantId: " + tenantId);
             return response;
 
-        }catch (Exception e)
-        {
-            throw new  DatabaseOperationException("Failed to delete the data from the database : "+e.getMessage());
+        } catch (Exception e) {
+            throw new DatabaseOperationException("Failed to delete the data from the database : " + e.getMessage());
         }
 
 
@@ -246,7 +222,6 @@ public class TenantServiceImpl implements TenantService {
 //    public Page<LoanResponseInList> getAll(Pageable pageable) {
 //        return this.loanApplicationRepository.findAllLoans(pageable);
 //    }
-
 
 
 }

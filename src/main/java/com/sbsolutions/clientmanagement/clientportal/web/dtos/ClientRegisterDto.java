@@ -22,5 +22,8 @@ public class ClientRegisterDto {
     // Isolation type - "DATABASE" or "SCHEMA"
     private String isolationType = "DATABASE"; // Default to database-per-tenant
 
+    private  String adminUsername;
+    private  String adminPassword;
+    private  String adminEmail;
 
 }

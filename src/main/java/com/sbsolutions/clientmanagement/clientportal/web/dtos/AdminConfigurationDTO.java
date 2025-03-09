@@ -9,4 +9,6 @@ public class AdminConfigurationDTO {
     private Long adminConfigurationId;
     private String username;
     private String password;
+    private  String email ;
+
 }

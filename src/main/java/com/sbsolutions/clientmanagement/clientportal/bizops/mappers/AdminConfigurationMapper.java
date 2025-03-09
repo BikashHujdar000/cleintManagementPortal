@@ -13,6 +13,7 @@ public class AdminConfigurationMapper {
         dto.setAdminConfigurationId(entity.getAdminConfigurationId());
         dto.setUsername(entity.getUsername());
         dto.setPassword(entity.getPassword());
+        dto.setEmail(entity.getEmail());
         return dto;
     }
 
@@ -24,6 +25,7 @@ public class AdminConfigurationMapper {
         entity.setAdminConfigurationId(dto.getAdminConfigurationId());
         entity.setUsername(dto.getUsername());
         entity.setPassword(dto.getPassword());
+        entity.setEmail(dto.getEmail());
         return entity;
     }
 }
