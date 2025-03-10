@@ -2,7 +2,9 @@ package com.sbsolutions.clientmanagement.clientportal.bizops.services;
 
 
 
+import ch.qos.logback.core.net.server.Client;
 import com.sbsolutions.clientmanagement.clientportal.bizops.entities.Tenant;
+import com.sbsolutions.clientmanagement.clientportal.web.dtos.Clients;
 import com.sbsolutions.clientmanagement.clientportal.web.dtos.DeletionResponse;
 import com.sbsolutions.clientmanagement.clientportal.web.dtos.TenantDTO;
 import org.springframework.data.domain.Page;
@@ -21,6 +23,8 @@ public interface TenantService {
 
     DeletionResponse deleteTenant(Long tenantId);
 
+
+    List<Clients> getAllClients();
 
     Page<TenantDTO> getAll(Pageable pageable);
 }

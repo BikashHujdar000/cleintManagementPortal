@@ -14,6 +14,7 @@ public class TenantDTO {
     private String organizationSwiftcode;
     private String organizationEmail;
     private String subDomainName;
+    private String  schemaName;
     private LocalDateTime createdDate;
     private LocalDateTime expirationDate;
     private boolean active;

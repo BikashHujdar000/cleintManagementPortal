@@ -2,6 +2,7 @@ package com.sbsolutions.clientmanagement.clientportal.web.api.internal.controlle
 
 
 import com.sbsolutions.clientmanagement.clientportal.bizops.entities.Tenant;
+import com.sbsolutions.clientmanagement.clientportal.web.dtos.Clients;
 import com.sbsolutions.clientmanagement.global.constants.PageUtils;
 import com.sbsolutions.clientmanagement.global.constants.PaginationInfo;
 import com.sbsolutions.clientmanagement.global.constants.SearchCriteria;
@@ -70,5 +71,12 @@ public class TenantController {
 
         PaginationInfo paginationInfo = new PaginationInfo(tenantPage.getNumber(), tenantPage.getSize(), tenantPage.getTotalElements(), tenantPage.getTotalPages(), tenantPage.isLast());
         return new RestResponse<>().oKWithPaginatedPayload(tenantPage.getContent(), paginationInfo, "Loans fetched Successfully.");
+    }
+
+    @GetMapping
+    @RequestMapping("/all/clients")
+    public  ResponseEntity<List<Clients>> getAllClients() {
+        List<Clients> clients = this.tenantService.getAllClients();
+       return  ResponseEntity.ok(clients);
     }
 }

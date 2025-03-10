@@ -25,12 +25,12 @@ public class Tenant {
 
     @Column(nullable = false, unique = true)
     private String organizationEmail;
-
     private String subDomainName;
     private LocalDateTime createdDate;
     private LocalDateTime expirationDate;
     private boolean active = false;
     private String phoneNumber;
+    private String   schemaName;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

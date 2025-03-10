@@ -9,6 +9,7 @@ import com.sbsolutions.clientmanagement.clientportal.bizops.entities.*;
 import com.sbsolutions.clientmanagement.clientportal.bizops.services.*;
 import com.sbsolutions.clientmanagement.clientportal.web.dtos.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -43,6 +44,9 @@ public class TenantServiceImpl implements TenantService {
         this.themeConfigurationService = themeConfigurationService;
         this.subscriptionTierService = subscriptionTierService;
     }
+
+    @Value("${client.creation.api}")
+    private  String apiUrl ;
 
     @Transactional
     @Override
@@ -130,7 +134,7 @@ public class TenantServiceImpl implements TenantService {
             try {
 
                 tenantResponseMono = webClient.post()
-                        .uri("http://localhost:8086/v1/admin/clients")
+                        .uri(apiUrl)
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(clientRegisterDto)
                         .retrieve()
@@ -183,6 +187,8 @@ public class TenantServiceImpl implements TenantService {
 
     }
 
+
+
     @Override
     public DeletionResponse deleteTenant(Long tenantId) {
 
@@ -197,6 +203,17 @@ public class TenantServiceImpl implements TenantService {
             throw new DatabaseOperationException("Failed to delete the data from the database : " + e.getMessage());
         }
 
+    }
+
+    @Override
+    public List<Clients> getAllClients() {
+
+        try {
+            List<Tenant> tenants = tenantRepository.findAll();
+            return tenants.stream().map(ClientMapper::toClientsDto).toList();
+        } catch (Exception e) {
+            throw new DatabaseOperationException("Failed to retrieve the data from the database :" + e.getMessage());
+        }
 
     }
 
