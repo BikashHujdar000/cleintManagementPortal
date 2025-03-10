@@ -21,15 +21,24 @@ public class Tenant {
     @Column(nullable = false)
     private String organizationName;
 
+    @Column(nullable = false, unique = true)
     private String organizationSwiftcode;
 
     @Column(nullable = false, unique = true)
     private String organizationEmail;
+
+    @Column(nullable = false, unique = true)
     private String subDomainName;
+
     private LocalDateTime createdDate;
+
     private LocalDateTime expirationDate;
+
     private boolean active = false;
+
+    @Column(nullable = false, unique = true)
     private String phoneNumber;
+
     private String   schemaName;
 
     @Enumerated(EnumType.STRING)

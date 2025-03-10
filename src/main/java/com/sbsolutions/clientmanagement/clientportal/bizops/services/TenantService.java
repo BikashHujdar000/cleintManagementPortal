@@ -27,4 +27,16 @@ public interface TenantService {
     List<Clients> getAllClients();
 
     Page<TenantDTO> getAll(Pageable pageable);
+
+    boolean phoneNumberExists(String phoneNumber);
+
+
+    boolean organizationEmailExists(String organizationEmail);
+
+
+    boolean subDomainNameExists(String subDomainName);
+
+
+    boolean organizationSwiftcodeExists(String organizationSwiftcode);
+
 }

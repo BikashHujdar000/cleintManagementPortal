@@ -10,6 +10,7 @@ import com.sbsolutions.clientmanagement.global.globalresponse.RestResponse;
 import com.sbsolutions.clientmanagement.clientportal.bizops.services.TenantService;
 import com.sbsolutions.clientmanagement.clientportal.web.dtos.DeletionResponse;
 import com.sbsolutions.clientmanagement.clientportal.web.dtos.TenantDTO;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class TenantController {
 
 
     @PostMapping
-    public ResponseEntity<?> createTenant(@RequestBody TenantDTO tenantDTO) {
+    public ResponseEntity<?> createTenant( @Valid  @RequestBody TenantDTO tenantDTO) {
         TenantDTO savedTenant = this.tenantService.createTenant(tenantDTO);
          return new RestResponse<>().createdStatusWithPayload(savedTenant,"Tenant Created Successfully");
     }

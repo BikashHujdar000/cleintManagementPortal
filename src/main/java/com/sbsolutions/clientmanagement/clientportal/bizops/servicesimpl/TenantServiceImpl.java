@@ -2,6 +2,7 @@ package com.sbsolutions.clientmanagement.clientportal.bizops.servicesimpl;
 
 
 import com.sbsolutions.clientmanagement.clientportal.web.exceptions.DatabaseOperationException;
+import com.sbsolutions.clientmanagement.clientportal.web.exceptions.DuplicateResourceException;
 import com.sbsolutions.clientmanagement.clientportal.web.exceptions.ResourceNotFoundException;
 import com.sbsolutions.clientmanagement.clientportal.bizops.mappers.*;
 import com.sbsolutions.clientmanagement.clientportal.bizops.repositories.TenantRepository;
@@ -10,6 +11,7 @@ import com.sbsolutions.clientmanagement.clientportal.bizops.services.*;
 import com.sbsolutions.clientmanagement.clientportal.web.dtos.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -19,6 +21,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,20 +49,31 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Value("${client.creation.api}")
-    private  String apiUrl ;
+    private String apiUrl;
 
     @Transactional
     @Override
     public TenantDTO createTenant(TenantDTO tenantDTO) {
 
 
-        // Validate required fields
-        if (tenantDTO.getOrganizationName() == null || tenantDTO.getOrganizationEmail() == null) {
-            throw new IllegalArgumentException("Organization Name and Email are required.");
-        }
-
-
         try {
+
+
+            // Check for duplicate fields directly from the database
+            if (phoneNumberExists(tenantDTO.getPhoneNumber())) {
+                throw new DuplicateResourceException("The phone number is already in use. Please use a different one.");
+            }
+            if (organizationEmailExists(tenantDTO.getOrganizationEmail())) {
+                throw new DuplicateResourceException("The organization email is already in use. Please use a different one.");
+            }
+            if (subDomainNameExists(tenantDTO.getSubDomainName())) {
+                throw new DuplicateResourceException("The subdomain name is already in use. Please use a different one.");
+            }
+            if (organizationSwiftcodeExists(tenantDTO.getOrganizationSwiftcode())) {
+                throw new DuplicateResourceException("The organization swift code is already in use. Please use a different one.");
+            }
+
+
 
 
             // Convert DTO to Entity
@@ -110,9 +124,8 @@ public class TenantServiceImpl implements TenantService {
                 tenant.setSubscriptionTier(subscriptionTier);
             }
 
-            Tenant savedTenant = this.tenantRepository.save(tenant);
+            Tenant savedTenant =this.tenantRepository.save(tenant);
 
-            log.info("Saved tenant {}", savedTenant);
 
 
             //adding the client api to set the client information in the  core app
@@ -188,7 +201,6 @@ public class TenantServiceImpl implements TenantService {
     }
 
 
-
     @Override
     public DeletionResponse deleteTenant(Long tenantId) {
 
@@ -223,7 +235,6 @@ public class TenantServiceImpl implements TenantService {
 
         Page<Tenant> tenantPage = this.tenantRepository.findAll(pageable);
 
-
         log.info("Get all tenants with pageable {}", tenantPage);
 
 
@@ -234,11 +245,33 @@ public class TenantServiceImpl implements TenantService {
 
     }
 
+    @Override
+    public boolean phoneNumberExists(String phoneNumber) {
+        return this.tenantRepository.findByPhoneNumber(phoneNumber).isPresent();
+    }
+
+    // Method to check if the organization email exists
+    @Override
+    public boolean organizationEmailExists(String organizationEmail) {
+        return this.tenantRepository.findByOrganizationEmail(organizationEmail).isPresent();
+    }
+
+    // Method to check if the subdomain name exists
+    @Override
+    public boolean subDomainNameExists(String subDomainName) {
+        return this.tenantRepository.findBySubDomainName(subDomainName).isPresent();
+    }
+
+    // Method to check if the organization swiftcode exists
+    @Override
+    public boolean organizationSwiftcodeExists(String organizationSwiftcode) {
+        return this.tenantRepository.findByOrganizationSwiftcode(organizationSwiftcode).isPresent();
+    }
+
     // for the pageable form
 //    @Override
 //    public Page<LoanResponseInList> getAll(Pageable pageable) {
 //        return this.loanApplicationRepository.findAllLoans(pageable);
 //    }
-
 
 }
